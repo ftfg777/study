@@ -1,5 +1,7 @@
 package com.example.study.controller;
 
+import com.example.study.dto.ApiResponse;
+import com.example.study.exception.ErrorCode;
 import com.example.study.model.User;
 import com.example.study.service.UserService;
 import java.util.List;
@@ -12,10 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
 
@@ -32,18 +35,18 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<User>> getUser(@PathVariable Long id) {
         User userDto = userService.getUserById(id);
         if (userDto == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ErrorCode.USER_NOT_FOUND));
         }
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(ApiResponse.success(userDto));
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         List<User> usersDto = userService.getAllUsers();
-        return ResponseEntity.ok(usersDto);
+        return ResponseEntity.ok(ApiResponse.success(usersDto));
     }
 
     @PutMapping("/{id}")
@@ -63,6 +66,17 @@ public class UserController {
 
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<ApiResponse<Void>> checkEmailDuplication(@RequestParam String email){
+        boolean isDuplicate = userService.findByEmail(email);
+
+        if (isDuplicate){
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ErrorCode.USER_ALREADY_EXISTS));
+        }
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
 

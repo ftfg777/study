@@ -6,8 +6,10 @@ import com.example.study.mapper.UserMapper;
 import com.example.study.model.User;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserMapper userMapper;
@@ -16,17 +18,19 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
+    @Transactional
     public int createUser(User user) {
         int result = userMapper.countByEmail(user.getEmail());
         //이메일 중복 체크
         if (result > 0) {
             throw new CommonExceptionHandler(ErrorCode.USER_ALREADY_EXISTS);
         }
+
        return userMapper.insertUser(user);
     }
 
     public User getUserById(Long id) {
-        User user = userMapper.findById(id);
+        User user = userMapper.getById(id);
         if (user == null){
             throw new CommonExceptionHandler(ErrorCode.USER_NOT_FOUND);
         }
@@ -46,4 +50,7 @@ public class UserService {
         userMapper.deleteUser(id);
     }
 
+    public boolean findByEmail(String email) {
+        return userMapper.findByEmail(email);
+    }
 }

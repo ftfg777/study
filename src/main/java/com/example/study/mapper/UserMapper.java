@@ -6,11 +6,17 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface UserMapper {
+
+    User getById(@Param("id") Long id);
+    void createdUser(User user);
+    void deleteUserById(@Param("id") Long id);
+
 
     @Insert("INSERT INTO users(name, email) VALUES(#{name}, #{email})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
@@ -30,4 +36,7 @@ public interface UserMapper {
 
     @Select("SELECT COUNT(*) FROM users WHERE email = #{email}")
     int countByEmail(String email);
+
+    @Select("SELECT COUNT(*) FROM users WHERE email = #{email}")
+    boolean findByEmail(String email);
 }
