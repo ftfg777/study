@@ -29,53 +29,44 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<Integer> createUser(@RequestBody User user) {
-        int result = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    public ResponseEntity<ApiResponse<User>> createUser(@RequestBody User user) {
+        userService.createUser(user);
+
+        return ResponseEntity.ok(ApiResponse.success(user));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<User>> getUser(@PathVariable Long id) {
         User userDto = userService.getUserById(id);
-        if (userDto == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ErrorCode.USER_NOT_FOUND));
-        }
+
         return ResponseEntity.ok(ApiResponse.success(userDto));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         List<User> usersDto = userService.getAllUsers();
+
         return ResponseEntity.ok(ApiResponse.success(usersDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        if (userService.getUserById(id) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        User updatedUserDto = userService.updateUser(id, user);
-        return ResponseEntity.ok(updatedUserDto);
+    public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
+        userService.updateUser(id, user);
+
+        return ResponseEntity.ok(ApiResponse.success(user));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        if (userService.getUserById(id) == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/check-email")
     public ResponseEntity<ApiResponse<Void>> checkEmailDuplication(@RequestParam String email){
-        boolean isDuplicate = userService.findByEmail(email);
+        userService.checkEmail(email);
 
-        if (isDuplicate){
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(ErrorCode.USER_ALREADY_EXISTS));
-        }
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 

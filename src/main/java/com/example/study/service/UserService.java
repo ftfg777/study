@@ -1,9 +1,9 @@
 package com.example.study.service;
 
-import com.example.study.exception.CommonExceptionHandler;
 import com.example.study.exception.ErrorCode;
 import com.example.study.mapper.UserMapper;
 import com.example.study.model.User;
+import com.example.study.util.ExceptionUtils;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,21 +19,16 @@ public class UserService {
     }
 
     @Transactional
-    public int createUser(User user) {
-        int result = userMapper.countByEmail(user.getEmail());
-        //이메일 중복 체크
-        if (result > 0) {
-            throw new CommonExceptionHandler(ErrorCode.USER_ALREADY_EXISTS);
-        }
+    public void createUser(User user) {
+        checkEmail(user.getEmail());
 
-       return userMapper.insertUser(user);
+        userMapper.createdUser(user);
     }
 
     public User getUserById(Long id) {
         User user = userMapper.getById(id);
-        if (user == null){
-            throw new CommonExceptionHandler(ErrorCode.USER_NOT_FOUND);
-        }
+        ExceptionUtils.throwIfNotFound(user, ErrorCode.USER_NOT_FOUND);
+
         return user;
     }
 
@@ -41,16 +36,28 @@ public class UserService {
         return userMapper.findAll();
     }
 
-    public User updateUser(Long id, User user) {
+    @Transactional
+    public void updateUser(Long id, User user) {
+        User updatedUser = getUserById(id);
+        ExceptionUtils.throwIfNotFound(updatedUser, ErrorCode.USER_NOT_FOUND);
+
         user.setId(id);
-        return userMapper.updateUser(user);
+        userMapper.updateUser(user);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
+        User user = userMapper.getById(id);
+        ExceptionUtils.throwIfNotFound(user, ErrorCode.USER_NOT_FOUND);
+
         userMapper.deleteUser(id);
     }
 
-    public boolean findByEmail(String email) {
-        return userMapper.findByEmail(email);
+    public void checkEmail(String email) {
+        int isDuplicate = userMapper.countByEmail(email);
+        ExceptionUtils.throwIfExists(isDuplicate, ErrorCode.EMAIL_ALREADY_EXISTS);
+
+        userMapper.findByEmail(email);
     }
+
 }

@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Update;
 public interface UserMapper {
 
     User getById(@Param("id") Long id);
-    void createdUser(User user);
+    int createdUser(User user);
     void deleteUserById(@Param("id") Long id);
 
 
@@ -29,7 +29,7 @@ public interface UserMapper {
     List<User> findAll();
 
     @Update("UPDATE users SET name=#{name}, email=#{email} WHERE id=#{id}")
-    User updateUser(User user);
+    void updateUser(User user);
 
     @Delete("DELETE FROM users WHERE id=#{id}")
     void deleteUser(Long id);

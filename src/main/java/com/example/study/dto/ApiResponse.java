@@ -3,7 +3,6 @@ package com.example.study.dto;
 import com.example.study.exception.ErrorCode;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter

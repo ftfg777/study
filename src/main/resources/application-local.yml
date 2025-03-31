@@ -25,3 +25,7 @@ mybatis:
     lazy-loading-enabled: true
     aggressive-lazy-loading: false
     map-underscore-to-camel-case: true
+
+springdoc:
+  swagger-ui:
+    path: /study-swagger-ui

@@ -12,7 +12,7 @@
   </select>
 
   <!-- 유저 삽입 -->
-  <insert id="createdUser" parameterType="com.example.study.model.User">
+  <insert id="createdUser" parameterType="com.example.study.model.User" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO users (name, email)
     VALUES (#{name}, #{email})
   </insert>
