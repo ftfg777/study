@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: local
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USER}
+    url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}
+    password: ${POSTGRES_PASSWORD}
+
+  application:
+    name: study
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: update
+    show-sql: 'true'
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
