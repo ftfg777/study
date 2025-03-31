@@ -1,13 +1,8 @@
 package com.example.study.exception;
 
 import com.example.study.dto.ErrorResponse;
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
@@ -25,14 +20,15 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<Map<String,String>> handleMethodNotAllowed() {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("code", "METHOD_NOT_ALLOWED");
-        errorResponse.put("message", "잘못된 접근입니다.");
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        ErrorResponse response = ErrorResponse.builder()
+            .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus().value())
+            .code(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+            .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
+            .build();
 
-        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(errorResponse);
+        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()).body(response);
     }
 
 }

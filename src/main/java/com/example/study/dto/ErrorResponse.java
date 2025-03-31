@@ -1,6 +1,7 @@
 package com.example.study.dto;
 
 import java.time.LocalDateTime;
+import lombok.Builder;
 
 public class ErrorResponse {
     private String code;
@@ -8,6 +9,7 @@ public class ErrorResponse {
     private String timestamp;
     private int status;
 
+    @Builder
     public ErrorResponse(String code, String message, int status) {
         this.code = code;
         this.message = message;
