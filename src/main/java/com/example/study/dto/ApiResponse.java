@@ -11,7 +11,7 @@ public class ApiResponse<T> {
     private final int status;     // HTTP 상태 코드
     private final String message; // 메시지
     private final T data;         // 응답 데이터 (성공 시)
-    private final ErrorCode errorCode; // 에러 코드 (실패 시)
+    private final ErrorCode code; // 에러 코드 (실패 시)
     private String timestamp;
 
 
@@ -29,7 +29,8 @@ public class ApiResponse<T> {
         return new ApiResponse<>(
             errorCode.getStatus().value(),
             errorCode.getMessage(),
-            null, errorCode,
+            null,
+            errorCode,
             LocalDateTime.now().toString());
     }
 

@@ -28,13 +28,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<User>> createUser(@RequestBody User user) {
-        userService.createUser(user);
-
-        return ResponseEntity.ok(ApiResponse.success(user));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<User>> getUser(@PathVariable Long id) {
         User userDto = userService.getUserById(id);

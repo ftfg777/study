@@ -14,11 +14,14 @@ import org.apache.ibatis.annotations.Update;
 public interface UserMapper {
 
     User getById(@Param("id") Long id);
-    int createdUser(User user);
+    void createdUser(User user);
     void deleteUserById(@Param("id") Long id);
 
+    @Select("select * from users where email = #{email}")
+    User emailLogin(String email);
 
-    @Insert("INSERT INTO users(name, email) VALUES(#{name}, #{email})")
+
+    @Insert("INSERT INTO users(email, name, password, role) VALUES(#{email}, #{name}, #{password}, #{role})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insertUser(User user);
 

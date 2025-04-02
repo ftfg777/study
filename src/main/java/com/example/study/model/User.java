@@ -2,46 +2,30 @@ package com.example.study.model;
 
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
-    private String name;
     private String email;
+    private String name;
+    private String password;
+    private String role;
 
-    public User() {
-    }
-
-    public User(Long id, String name, String email) {
-        this.id = id;
-        this.name = name;
+    @Builder
+    public User(String email, String name, String password, String role) {
         this.email = email;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 }
