@@ -29,3 +29,7 @@ mybatis:
 springdoc:
   swagger-ui:
     path: /study-swagger-ui
+
+jwt:
+  access-token-expiration: 3600000  # 1시간 (ms 기준)
+  refresh-token-expiration-days: 7

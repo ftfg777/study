@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.study.jwt.RefreshTokenMapper">
+
+  <select id="findByEmail" resultType="com.example.study.jwt.RefreshToken">
+    SELECT email, token, expiry_at
+    FROM refresh_token
+    WHERE email = #{email}
+  </select>
+
+  <insert id="save">
+    INSERT INTO refresh_token (email, token, expiry_at)
+    VALUES (#{email}, #{token}, #{expiryAt})
+    ON CONFLICT (email)
+    DO UPDATE SET token = EXCLUDED.token, expiry_at = EXCLUDED.expiry_at
+  </insert>
+
+  <delete id="deleteByEmail">
+    DELETE FROM refresh_token WHERE email = #{email}
+  </delete>
+</mapper>

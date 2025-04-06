@@ -6,10 +6,11 @@ import com.example.study.dto.LoginResponse;
 import com.example.study.dto.RegisterRequest;
 import com.example.study.exception.ErrorCode;
 import com.example.study.jwt.JwtUtil;
+import com.example.study.jwt.RefreshToken;
+import com.example.study.jwt.RefreshTokenMapper;
 import com.example.study.mapper.UserMapper;
 import com.example.study.model.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,11 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserMapper userMapper;
+    private final RefreshTokenMapper refreshTokenMapper;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserMapper userMapper, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+    public AuthController(UserMapper userMapper, RefreshTokenMapper refreshTokenMapper,
+        JwtUtil jwtUtil,
+        PasswordEncoder passwordEncoder) {
         this.userMapper = userMapper;
+        this.refreshTokenMapper = refreshTokenMapper;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
     }
@@ -47,13 +52,16 @@ public class AuthController {
         User foundUser = userMapper.emailLogin(loginRequest.getEmail());
 
         if (foundUser != null && passwordEncoder.matches(loginRequest.getPassword(), foundUser.getPassword())) {
-            String token = jwtUtil.generateToken(foundUser.getEmail());
+            String accessToken = jwtUtil.generateAccessToken(foundUser.getEmail());
+            String refreshToken = jwtUtil.generateRefreshToken(foundUser.getEmail());
+
+            refreshTokenMapper.save(foundUser.getEmail(), refreshToken, jwtUtil.getRefreshTokenExpiry());
 
             return ResponseEntity.ok(ApiResponse.success(
                 new LoginResponse(
                 foundUser.getEmail(),
                 foundUser.getName(),
-                token))
+                accessToken, refreshToken))
             );
         }
         return ResponseEntity

@@ -1,4 +1,4 @@
-package com.example.study.jwt;
+package com.example.study.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
