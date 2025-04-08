@@ -38,7 +38,7 @@ public class JwtUtil {
 
     // 리프레쉬 토큰 생성
     public String generateRefreshToken(String email){
-        long expirationMillis = jwtProperties.getAccessTokenExpiration() * 24 * 60 * 60 * 1000L; // 7일 -> 밀리초
+        long expirationMillis = jwtProperties.getRefreshTokenExpirationDays() * 24 * 60 * 60 * 1000L; // 7일 -> 밀리초
         Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
 
         return Jwts.builder()
