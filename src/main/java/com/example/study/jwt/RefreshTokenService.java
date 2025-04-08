@@ -2,8 +2,6 @@ package com.example.study.jwt;
 
 import com.example.study.exception.CommonExceptionHandler;
 import com.example.study.exception.ErrorCode;
-import com.example.study.mapper.UserMapper;
-import com.example.study.model.User;
 import org.springframework.stereotype.Service;
 
 @Service

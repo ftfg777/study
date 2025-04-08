@@ -38,10 +38,13 @@ public class JwtUtil {
 
     // 리프레쉬 토큰 생성
     public String generateRefreshToken(String email){
+        long expirationMillis = jwtProperties.getAccessTokenExpiration() * 24 * 60 * 60 * 1000L; // 7일 -> 밀리초
+        Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
+
         return Jwts.builder()
             .setSubject(email)
             .setIssuedAt(new Date())
-            .setExpiration(Date.from(getRefreshTokenExpiry().toInstant()))
+            .setExpiration(expirationDate)
             .signWith(refreshKey)
             .compact();
     }
@@ -57,6 +60,19 @@ public class JwtUtil {
             return claims.getSubject();
 
         }catch (JwtException ex){
+            return null;
+        }
+    }
+
+    public String extractEmailFromRefreshToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                .setSigningKey(refreshKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+            return claims.getSubject();
+        } catch (JwtException e) {
             return null;
         }
     }
@@ -93,7 +109,7 @@ public class JwtUtil {
     }
 
 
-    // DB에 저장될 날짜 타입이라 변환 메소드 필요
+    // DB에 저장 변환 메소드 필요
     public Timestamp getRefreshTokenExpiry() {
         return Timestamp.valueOf(LocalDateTime.now().plusDays(jwtProperties.getRefreshTokenExpirationDays()));
     }

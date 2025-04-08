@@ -12,10 +12,17 @@
 
   <insert id="save">
     INSERT INTO refresh_token (email, token, expiry_at)
-    VALUES (#{email}, #{token}, #{expiryAt})
+    VALUES (#{refreshToken.email}, #{refreshToken.token}, #{refreshToken.expiryAt})
     ON CONFLICT (email)
     DO UPDATE SET token = EXCLUDED.token, expiry_at = EXCLUDED.expiry_at
   </insert>
+
+  <update id="update" parameterType="com.example.study.jwt.RefreshToken">
+    UPDATE refresh_token
+    SET token = #{refreshToken.token},
+    expiry_at = #{refreshToken.expiryAt}
+    WHERE email = #{refreshToken.email}
+  </update>
 
   <delete id="deleteByEmail">
     DELETE FROM refresh_token WHERE email = #{email}

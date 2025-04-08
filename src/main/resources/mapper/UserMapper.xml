@@ -6,7 +6,7 @@
   <cache />
   <!-- 유저 조회 -->
   <select id="getById" parameterType="long" resultType="com.example.study.model.User">
-    SELECT id, email, name
+    SELECT id, email, name, password, role
     FROM users
     WHERE id = #{id}
   </select>

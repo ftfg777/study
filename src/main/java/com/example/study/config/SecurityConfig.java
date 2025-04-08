@@ -18,6 +18,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // CSRF 비활성화
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/v1/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll() // 인증 없이 접근 가능
                 .anyRequest().authenticated() // 그 외 모든 요청 인증 필요
             );

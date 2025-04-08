@@ -1,6 +1,5 @@
 package com.example.study.jwt;
 
-import java.sql.Timestamp;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,7 +8,9 @@ public interface RefreshTokenMapper {
 
     RefreshToken findByEmail(@Param("email") String email);
 
-    void save(@Param("email") String email, @Param("token") String token, @Param("expiryAt") Timestamp expiryAt);
+    void save(@Param("refreshToken") RefreshToken refreshToken);
 
     void deleteByEmail(@Param("email") String email);
+
+    void update(@Param("refreshToken") RefreshToken refreshToken);
 }
