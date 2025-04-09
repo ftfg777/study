@@ -31,5 +31,5 @@ springdoc:
     path: /study-swagger-ui
 
 jwt:
-  access-token-expiration: 3600000  # 1시간 (ms 기준)
-  refresh-token-expiration-days: 7
+  access-token-expiration: 3600000      # 1시간 (ms)
+  refresh-token-expiration: 604800000   # 7일 (ms, 7 * 24 * 60 * 60 * 1000)

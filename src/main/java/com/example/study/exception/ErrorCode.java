@@ -28,7 +28,6 @@ public enum ErrorCode {
     MISMATCHED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "MISMATCHED_ACCESS_TOKEN", "액세스 토큰이 일치하지 않습니다.");
 
 
-
     private final HttpStatus status;
     private final String code;
     private final String message;

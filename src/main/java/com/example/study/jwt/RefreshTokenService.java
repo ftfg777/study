@@ -16,11 +16,9 @@ public class RefreshTokenService {
     }
 
     public String reissueAccessToken(String refreshToken) {
-        if (!jwtUtil.validateRefreshToken(refreshToken)) {
-            throw new CommonExceptionHandler(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
+        jwtUtil.validateRefreshToken(refreshToken);
 
-        String email = jwtUtil.extractEmail(refreshToken);
+        String email = jwtUtil.extractEmailFromRefreshToken(refreshToken);
 
         RefreshToken savedToken = refreshTokenMapper.findByEmail(email);
 

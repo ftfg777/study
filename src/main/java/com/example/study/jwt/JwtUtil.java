@@ -19,99 +19,86 @@ public class JwtUtil {
         this.jwtProperties = jwtProperties;
     }
 
-    private static final String SECRET_KEY = "your-256-bit-secret-your-256-bit-secret";
+    private static final String ACCESS_SECRET_KEY = "your-256-bit-secret-your-256-bit-secret";
     private static final String REFRESH_SECRET_KEY = "your-256-bit-refresh-secret-your-256-bit-refresh-secret";
+    private static final Key ACCESS_KEY = Keys.hmacShaKeyFor(ACCESS_SECRET_KEY.getBytes());
+    private static final Key REFRESH_KEY = Keys.hmacShaKeyFor(REFRESH_SECRET_KEY.getBytes());
 
-    private static final Key accesskey = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-    private static final Key refreshKey = Keys.hmacShaKeyFor(REFRESH_SECRET_KEY.getBytes());
+
+    // 공통 토큰 생성 (공통화)
+    private String generateToken(String email, Key signingKey, long expirationMillis) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expirationMillis);
+        return Jwts.builder()
+            .setSubject(email)
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .signWith(signingKey)
+            .compact();
+    }
 
 
     // 액세스 토큰 생성
     public String generateAccessToken(String email) {
-        return Jwts.builder()
-            .setSubject(email)  // username 대신 email 사용
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessTokenExpiration()))
-            .signWith(accesskey)
-            .compact();
+        return generateToken(email, ACCESS_KEY, jwtProperties.getAccessTokenExpiration());
     }
 
-    // 리프레쉬 토큰 생성
-    public String generateRefreshToken(String email){
-        long expirationMillis = jwtProperties.getRefreshTokenExpirationDays() * 24 * 60 * 60 * 1000L; // 7일 -> 밀리초
-        Date expirationDate = new Date(System.currentTimeMillis() + expirationMillis);
 
-        return Jwts.builder()
-            .setSubject(email)
-            .setIssuedAt(new Date())
-            .setExpiration(expirationDate)
-            .signWith(refreshKey)
-            .compact();
+    // 리프레시 토큰 생성
+    public String generateRefreshToken(String email) {
+        return generateToken(email, REFRESH_KEY, jwtProperties.getRefreshTokenExpiration());
     }
 
-    // 토큰에서 이메일 추출 (액세스 토큰)
-    public String extractEmail(String token) {
-        try {
+
+    // 토큰에서 이메일 추출 (공통화)
+    private String extractEmail(String token, Key key) throws JwtException {
             Claims claims = Jwts.parserBuilder()
-                .setSigningKey(accesskey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
             return claims.getSubject();
+    }
 
-        }catch (JwtException ex){
-            return null;
-        }
+    public String extractEmailFromAccessToken(String token) {
+        return extractEmail(token, ACCESS_KEY);
     }
 
     public String extractEmailFromRefreshToken(String token) {
+        return extractEmail(token, REFRESH_KEY);
+    }
+
+
+    // 액세스 토큰 유효성 검증
+    public boolean validateAccessToken(String token, UserDetails userDetails) {
+        String email = extractEmailFromAccessToken(token);
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token, ACCESS_KEY));
+    }
+
+    // 리프레시 토큰 유효성 검증
+    public void validateRefreshToken(String token) throws JwtException{
+            Jwts.parserBuilder()
+                .setSigningKey(REFRESH_KEY)
+                .build()
+                .parseClaimsJws(token);
+    }
+
+    private boolean isTokenExpired(String token, Key key) {
         try {
             Claims claims = Jwts.parserBuilder()
-                .setSigningKey(refreshKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-            return claims.getSubject();
+            return claims.getExpiration().before(new Date());
         } catch (JwtException e) {
-            return null;
+            return true; // 만료 또는 유효하지 않음
         }
     }
 
-    // 토큰 유효성 검증 (액세스 토큰)
-    public boolean validateAccessToken(String token, UserDetails userDetails) {
-        String email = extractEmail(token);
-        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
-    }
-
-    private boolean isTokenExpired(String token) {
-        try {
-            Jwts.parserBuilder()
-                .setSigningKey(accesskey)
-                .build()
-                .parseClaimsJws(token); // 토큰이 유효한지 확인
-            return true;
-        }catch (JwtException ex){
-            return false;
-        }
-    }
-
-    // 리프레시 토큰 검증
-    public boolean validateRefreshToken(String token){
-        try {
-            Jwts.parserBuilder()
-                .setSigningKey(refreshKey)
-                .build()
-                .parseClaimsJws(token);
-            return true;
-        }catch (JwtException ex){
-            return false;
-        }
-    }
-
-
-    // DB에 저장 변환 메소드 필요
+    // DB용 만료 시간 계산
     public Timestamp getRefreshTokenExpiry() {
-        return Timestamp.valueOf(LocalDateTime.now().plusDays(jwtProperties.getRefreshTokenExpirationDays()));
+        return new Timestamp(System.currentTimeMillis() + jwtProperties.getRefreshTokenExpiration());
     }
 
 }
